@@ -4,7 +4,7 @@ import { BrowserRouter as Switch, Link } from "react-router-dom";
 
 import axios from "axios";
 import Post from "./Post";
-function Userpage() {
+function Userpage({ username }) {
   const [posts, setPosts] = useState([]);
   const [userinfo, setUserinfo] = useState([]);
   const id = useParams().id;
@@ -28,7 +28,8 @@ function Userpage() {
   }, [id]);
   return (
     <div className="row">
-      <div className="col-md-3">
+      <div className="col-md-2"></div>
+      <div className="col-md-2">
         <div className="userpanel panel panel-default text-center newmd">
           <div className="panel-heading">
             <div className="panel-body">
@@ -56,13 +57,16 @@ function Userpage() {
           </div>
         </div>
       </div>
-      <div className="col-md-9">
+      <div className="col-md-1"></div>
+      <div className="col-md-6">
         {posts.map((post) => (
           <Post
+            x={username}
             key={post._id}
             displayName={post.user}
             timestamp={post.timestamp}
             text={post.content}
+            avatar={post.avatar}
           />
         ))}
       </div>

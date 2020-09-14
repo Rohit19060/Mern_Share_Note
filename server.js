@@ -134,11 +134,11 @@ app.post("/api/login", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      const user = users.filter((u) => u.id === username);
+      const user = users.filter((u) => u.id === username)[0];
+
       if (!user) {
         return res.status(401).json({ error: "invalid username or password" });
       } else {
-        console.log(bcrypt.compare(password, user.password));
         if (bcrypt.compare(password, user.password)) {
           const userForToken = {
             username: user.id,
@@ -161,11 +161,12 @@ app.post("/api/login", (req, res) => {
 });
 
 app.post("/api/posts", (req, res) => {
-  const { content } = req.body;
+  const { content, user, avatar } = req.body;
   let post = new PostSchema();
-  post.user = "Rohit";
+  post.user = user;
   post.content = content;
   post.likes = [];
+  post.avatar = avatar;
   post.save(function (err) {
     if (err) {
       console.log(err);

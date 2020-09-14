@@ -69,7 +69,11 @@ class App extends Component {
           <Layout>
             <Switch>
               <Route exact path="/">
-                <Home />
+                <Home
+                  username={this.state.username}
+                  follows={this.state.follows}
+                  avatar={this.state.avatar}
+                />
               </Route>
               <Route path="/users">
                 <Users />
@@ -78,7 +82,7 @@ class App extends Component {
                 <About />
               </Route>
               <Route path="/user/:id">
-                <Userpage />
+                <Userpage username={this.state.username} />
               </Route>
               <Route path="/register">
                 <Register Adduser={this.Adduser} />

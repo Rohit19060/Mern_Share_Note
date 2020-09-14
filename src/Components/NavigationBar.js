@@ -39,59 +39,63 @@ class NavigationBar extends Component {
           >
             <ul className="navbar-nav mr-auto">
               <li>
-                <Link to="/">Home</Link>
+                <Link to="/" className="links">
+                  Home
+                </Link>
               </li>
               <li>
-                <Link to="/users">Users</Link>
+                <Link to="/users" className="links">
+                  Users
+                </Link>
               </li>
               <li>
-                <Link to="/about">About</Link>
+                <Link to="/about" className="links">
+                  About
+                </Link>
               </li>
               <li>
-                <Link to="/contact">Contact</Link>
+                <Link to="/contact" className="links">
+                  Contact
+                </Link>
               </li>
             </ul>
             {this.props.username ? (
-              <div className="form-check-inline">
-                Logged in as
-                <span style={{ fontSize: "24px", margin: "0 4px" }}>
-                  {this.props.username}
-                </span>
-                <button
-                  onClick={this.props.logout}
-                  className="btn btn-outline-primary"
-                >
-                  Logout
-                </button>
-              </div>
+              <button
+                onClick={this.props.logout}
+                className="btn btn-outline-danger"
+              >
+                Logout
+              </button>
             ) : (
-              <form onSubmit={this.formHandler} className="form-check-inline">
-                <input
-                  type="text"
-                  name="username"
-                  className="form-control"
-                  onChange={this.onChange}
-                  placeholder="Username"
-                  required
-                />
-                <input
-                  className="form-control"
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  onChange={this.onChange}
-                  required
-                />
-                <input
-                  type="submit"
-                  value="Login"
-                  className="btn btn-outline-primary"
-                />
-              </form>
+              <>
+                <form onSubmit={this.formHandler} className="form-check-inline">
+                  <input
+                    type="text"
+                    name="username"
+                    className="form-control"
+                    onChange={this.onChange}
+                    placeholder="Username"
+                    required
+                  />
+                  <input
+                    className="form-control"
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    onChange={this.onChange}
+                    required
+                  />
+                  <input
+                    type="submit"
+                    value="Login"
+                    className="btn btn-outline-primary"
+                  />
+                </form>
+                <Link to="/register">
+                  <button className="btn btn-outline-primary">Register</button>
+                </Link>
+              </>
             )}
-            <Link to="/register">
-              <button className="btn btn-outline-primary">Register</button>
-            </Link>
           </div>
         </div>
       </div>

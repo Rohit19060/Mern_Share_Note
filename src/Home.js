@@ -43,7 +43,10 @@ class Home extends Component {
             <div className="col-md-2">
               <div className="panel panel-default text-center newmd">
                 <div className="panel-heading h3">Welcome {username}</div>
-                <div className="panel-body"></div>
+                <div className="panel-body">
+                  <img src={avatar} alt="avatar" width="200px" />
+                  {follows}
+                </div>
               </div>
             </div>
             <div className="col-md-6">
@@ -65,6 +68,7 @@ class Home extends Component {
               {this.state.posts
                 ? this.state.posts.map((post) => (
                     <Post
+                      delete={this.props.delete}
                       x={username}
                       key={post._id}
                       displayName={post.user}
@@ -83,6 +87,7 @@ class Home extends Component {
               {this.state.posts
                 ? this.state.posts.map((post) => (
                     <Post
+                      delete={this.props.delete}
                       x={username}
                       key={post._id}
                       displayName={post.user}

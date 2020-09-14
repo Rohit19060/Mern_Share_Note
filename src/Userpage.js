@@ -61,6 +61,7 @@ function Userpage({ username }) {
       <div className="col-md-6">
         {posts.map((post) => (
           <Post
+            delete={this.props.delete}
             x={username}
             key={post._id}
             displayName={post.user}

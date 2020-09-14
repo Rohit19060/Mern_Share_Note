@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
 class Post extends Component {
@@ -15,7 +16,10 @@ class Post extends Component {
             <span> {timestamp}</span>
             <div>{text}</div>
             {x && x === displayName ? (
-              <button className="btn btn-outline-danger float-right">
+              <button
+                onClick={this.props.delete.bind(this, this.props.timestamp)}
+                className="btn btn-outline-danger float-right"
+              >
                 Delete
               </button>
             ) : (

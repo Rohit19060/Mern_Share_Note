@@ -45,6 +45,23 @@ app.get("/api/posts", (req, res) => {
   });
 });
 
+app.post("/api/posts", (req, res) => {
+  const { content, user, avatar } = req.body;
+  let post = new PostSchema();
+  post.user = user;
+  post.content = content;
+  post.likes = [];
+  post.avatar = avatar;
+  post.save(function (err) {
+    if (err) {
+      console.log(err);
+      return;
+    } else {
+      res.json(post);
+    }
+  });
+});
+
 app.get("/api/users", (req, res) => {
   UserSchema.find({}, (err, users) => {
     if (err) {
@@ -53,6 +70,13 @@ app.get("/api/users", (req, res) => {
       res.json(users);
     }
   });
+});
+
+app.delete("/api/delpost", (req, res) => {
+  var time = req.query.time;
+  console.log(time);
+  PostSchema.deleteOne({ timestamp: time });
+  console.log("Got Delete Request");
 });
 
 app.get("/api/posts/:id", (req, res) => {
@@ -156,23 +180,6 @@ app.post("/api/login", (req, res) => {
             .json({ error: "invalid username or password" });
         }
       }
-    }
-  });
-});
-
-app.post("/api/posts", (req, res) => {
-  const { content, user, avatar } = req.body;
-  let post = new PostSchema();
-  post.user = user;
-  post.content = content;
-  post.likes = [];
-  post.avatar = avatar;
-  post.save(function (err) {
-    if (err) {
-      console.log(err);
-      return;
-    } else {
-      res.json(post);
     }
   });
 });

@@ -56,6 +56,16 @@ class App extends Component {
     console.log("Logout Successfully");
   };
 
+  delete = (time) => {
+    console.log("Delete button pressed" + time);
+    axios
+      .delete("http://localhost:5000/api/delpost?time=" + time)
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.error(err));
+  };
+
   render() {
     return (
       <div>
@@ -73,6 +83,7 @@ class App extends Component {
                   username={this.state.username}
                   follows={this.state.follows}
                   avatar={this.state.avatar}
+                  delete={this.delete}
                 />
               </Route>
               <Route path="/users">
@@ -82,7 +93,7 @@ class App extends Component {
                 <About />
               </Route>
               <Route path="/user/:id">
-                <Userpage username={this.state.username} />
+                <Userpage username={this.state.username} delete={this.delete} />
               </Route>
               <Route path="/register">
                 <Register Adduser={this.Adduser} />

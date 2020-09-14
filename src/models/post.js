@@ -7,7 +7,7 @@ var datetime =
   (currentdate.getMonth() + 1) +
   "-" +
   currentdate.getFullYear() +
-  " " +
+  "_" +
   currentdate.getHours() +
   ":" +
   currentdate.getMinutes() +

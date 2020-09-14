@@ -95,24 +95,10 @@ app.get("/api/user/:id", (req, res) => {
   });
 });
 
-const getUser = (username) => {
-  UserSchema.find({}, (err, users) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("====================================");
-      console.log(users.filter((u) => u.id === username));
-      console.log("====================================");
-      return users.filter((u) => u.id === username);
-    }
-  });
-};
-
 app.post("/api/register", (req, res) => {
   const { id, password, avatar } = req.body;
   if (id !== null && password !== null && avatar !== null) {
     const follows = [];
-    // const user = getUser(id);
     UserSchema.find({}, (err, users) => {
       if (err) {
         console.log(err);
@@ -144,24 +130,34 @@ app.post("/api/register", (req, res) => {
 
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
-  const user = getUser(username);
-  if (!user) {
-    return res.status(401).json({ error: "invalid username or password" });
-  }
-  if (bcrypt.compare(password, user.password)) {
-    const userForToken = {
-      username: user.id,
-    };
-    const token = jwt.sign(userForToken, SECRET);
-    return res.status(200).json({
-      token,
-      username: user.id,
-      avatar: user.avatar,
-      follows: user.follows,
-    });
-  } else {
-    return res.status(401).json({ error: "invalid username or password" });
-  }
+  UserSchema.find({}, (err, users) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const user = users.filter((u) => u.id === username);
+      if (!user) {
+        return res.status(401).json({ error: "invalid username or password" });
+      } else {
+        console.log(bcrypt.compare(password, user.password));
+        if (bcrypt.compare(password, user.password)) {
+          const userForToken = {
+            username: user.id,
+          };
+          const token = jwt.sign(userForToken, SECRET);
+          return res.status(200).json({
+            token,
+            username: user.id,
+            avatar: user.avatar,
+            follows: user.follows,
+          });
+        } else {
+          return res
+            .status(401)
+            .json({ error: "invalid username or password" });
+        }
+      }
+    }
+  });
 });
 
 app.post("/api/posts", (req, res) => {

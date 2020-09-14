@@ -59,7 +59,7 @@ function Userpage() {
       <div className="col-md-9">
         {posts.map((post) => (
           <Post
-            key={post.id}
+            key={post._id}
             displayName={post.user}
             timestamp={post.timestamp}
             text={post.content}

@@ -27,7 +27,6 @@ class App extends Component {
     axios
       .post("http://localhost:5000/api/login", user)
       .then((res) => {
-        console.log(res.data);
         this.setState({
           username: res.data.username,
           avatar: res.data.avatar,
@@ -45,25 +44,12 @@ class App extends Component {
     };
     axios
       .post("http://localhost:5000/api/register", user)
-      .then((res) => {
-        console.log(res.data);
-      })
+      .then((res) => {})
       .catch((err) => console.error(err));
   };
 
   logout = () => {
     this.setState({ username: null, avatar: null, follows: null });
-    console.log("Logout Successfully");
-  };
-
-  delete = (time) => {
-    console.log("Delete button pressed" + time);
-    axios
-      .delete("http://localhost:5000/api/delpost?time=" + time)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => console.error(err));
   };
 
   render() {
@@ -83,7 +69,6 @@ class App extends Component {
                   username={this.state.username}
                   follows={this.state.follows}
                   avatar={this.state.avatar}
-                  delete={this.delete}
                 />
               </Route>
               <Route path="/users">
@@ -93,7 +78,10 @@ class App extends Component {
                 <About />
               </Route>
               <Route path="/user/:id">
-                <Userpage username={this.state.username} delete={this.delete} />
+                <Userpage
+                  username={this.state.username}
+                  follows={this.state.follows}
+                />
               </Route>
               <Route path="/register">
                 <Register Adduser={this.Adduser} />

@@ -16,6 +16,7 @@ class NavigationBar extends Component {
   formHandler = (e) => {
     e.preventDefault();
     this.props.setUser(this.state.username, this.state.password);
+    document.getElementById("loginform").reset();
   };
 
   render() {
@@ -68,7 +69,11 @@ class NavigationBar extends Component {
               </button>
             ) : (
               <>
-                <form onSubmit={this.formHandler} className="form-check-inline">
+                <form
+                  onSubmit={this.formHandler}
+                  className="form-check-inline"
+                  id="loginform"
+                >
                   <input
                     type="text"
                     name="username"

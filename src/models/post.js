@@ -1,19 +1,5 @@
 let mongoose = require("mongoose");
 
-var currentdate = new Date();
-var datetime =
-  currentdate.getDate() +
-  "-" +
-  (currentdate.getMonth() + 1) +
-  "-" +
-  currentdate.getFullYear() +
-  "_" +
-  currentdate.getHours() +
-  ":" +
-  currentdate.getMinutes() +
-  ":" +
-  currentdate.getSeconds();
-
 let PostSchema = new mongoose.Schema({
   user: {
     type: String,
@@ -21,7 +7,7 @@ let PostSchema = new mongoose.Schema({
   },
   timestamp: {
     type: String,
-    default: datetime,
+    required: true,
   },
   content: {
     type: String,

@@ -48,6 +48,21 @@ app.get("/api/posts", (req, res) => {
 app.post("/api/posts", (req, res) => {
   const { content, user, avatar } = req.body;
   let post = new PostSchema();
+
+  var currentdate = new Date();
+  var datetime =
+    currentdate.getDate() +
+    "-" +
+    (currentdate.getMonth() + 1) +
+    "-" +
+    currentdate.getFullYear() +
+    "_" +
+    currentdate.getHours() +
+    ":" +
+    currentdate.getMinutes() +
+    ":" +
+    currentdate.getSeconds();
+  post.timestamp = datetime;
   post.user = user;
   post.content = content;
   post.likes = [];
@@ -75,8 +90,21 @@ app.get("/api/users", (req, res) => {
 app.delete("/api/delpost", (req, res) => {
   var time = req.query.time;
   console.log(time);
-  PostSchema.deleteOne({ timestamp: time });
-  console.log("Got Delete Request");
+  let query = { timestamp: time };
+  PostSchema.deleteOne(query, function (err) {
+    if (err) {
+      console.log(err);
+      return;
+    } else {
+      PostSchema.find({}, (err, posts) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(posts);
+        }
+      });
+    }
+  });
 });
 
 app.get("/api/posts/:id", (req, res) => {
@@ -127,8 +155,8 @@ app.post("/api/register", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        var user = users.filter((u) => u.id === id);
-        if (!user) {
+        var user = users.filter((u) => u.id === id)[0];
+        if (user) {
           return res.status(401).json({ error: "Try again with another Id" });
         } else {
           let user = new UserSchema();
@@ -159,7 +187,6 @@ app.post("/api/login", (req, res) => {
       console.log(err);
     } else {
       const user = users.filter((u) => u.id === username)[0];
-
       if (!user) {
         return res.status(401).json({ error: "invalid username or password" });
       } else {
@@ -182,4 +209,62 @@ app.post("/api/login", (req, res) => {
       }
     }
   });
+});
+
+app.post("/api/follow", (req, res) => {
+  const { user, follow } = req.body;
+  UserSchema.updateOne(
+    { id: user },
+    {
+      $push: {
+        follows: follow,
+      },
+    },
+    {
+      upsert: true,
+      multi: true,
+    },
+    (err, users) => {
+      if (err) {
+        console.log(err);
+      } else {
+        UserSchema.find({}, (err, users) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.json(users.filter((e) => e.id === user)[0].follows);
+          }
+        });
+      }
+    }
+  );
+});
+
+app.post("/api/unfollow", (req, res) => {
+  const { user, follow } = req.body;
+  UserSchema.updateOne(
+    { id: user },
+    {
+      $pull: {
+        follows: follow,
+      },
+    },
+    {
+      upsert: true,
+      multi: true,
+    },
+    (err, users) => {
+      if (err) {
+        console.log(err);
+      } else {
+        UserSchema.find({}, (err, users) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.json(users.filter((e) => e.id === user)[0].follows);
+          }
+        });
+      }
+    }
+  );
 });

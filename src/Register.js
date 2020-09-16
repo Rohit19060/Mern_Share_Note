@@ -16,11 +16,16 @@ class Register extends Component {
   formHandler = (e) => {
     e.preventDefault();
     this.props.Adduser(this.state.id, this.state.password, this.state.avatar);
+    document.getElementById("registerform").reset();
   };
 
   render() {
     return (
-      <form onSubmit={this.formHandler} className="container p-5 text-center ">
+      <form
+        onSubmit={this.formHandler}
+        className="container p-5 text-center"
+        id="registerform"
+      >
         <input
           type="text"
           name="id"

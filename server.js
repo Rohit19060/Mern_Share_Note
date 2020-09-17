@@ -2,10 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-// const path = require("path");
+const path = require("path");
 const port = process.env.PORT || 5000;
 
 const SECRET = "This is my Secret";
@@ -27,10 +26,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// app.use(express.static(path.resolve(__dirname, "build")));
+app.use(express.static(path.resolve(__dirname, "build")));
 
-// var rawdata = fs.readFileSync("data/data.json");
-// var data = JSON.parse(rawdata);
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
@@ -65,7 +62,7 @@ app.post("/api/posts", (req, res) => {
   post.timestamp = datetime;
   post.user = user;
   post.content = content;
-  post.likes = [];
+  post.likes = 0;
   post.avatar = avatar;
   post.save(function (err) {
     if (err) {
@@ -190,7 +187,7 @@ app.post("/api/login", (req, res) => {
       if (!user) {
         return res.status(401).json({ error: "invalid username or password" });
       } else {
-        if (bcrypt.compare(password, user.password)) {
+        if (password === user.password) {
           const userForToken = {
             username: user.id,
           };
@@ -262,6 +259,37 @@ app.post("/api/unfollow", (req, res) => {
             console.log(err);
           } else {
             res.json(users.filter((e) => e.id === user)[0].follows);
+          }
+        });
+      }
+    }
+  );
+});
+
+app.put("/api/follow", (req, res) => {
+  const { timestamp } = req.body;
+  console.log(timestamp);
+  PostSchema.updateOne(
+    { timestamp: timestamp },
+    {
+      $inc: {
+        likes: 1,
+      },
+    },
+    {
+      upsert: true,
+      multi: true,
+    },
+    (err, posts) => {
+      if (err) {
+        console.log(err);
+      } else {
+        PostSchema.find({}, (err, posts) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.json(posts.filter((e) => e.timestamp === timestamp)[0].likes);
+            console.log(posts);
           }
         });
       }

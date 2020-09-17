@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Home from "./Home";
 import About from "./About";
+import Contact from "./Contact";
 import Users from "./Users";
 import Userpage from "./Userpage";
 import Register from "./Register";
@@ -25,7 +26,7 @@ class App extends Component {
       password,
     };
     axios
-      .post("http://localhost:5000/api/login", user)
+      .post("/api/login", user)
       .then((res) => {
         this.setState({
           username: res.data.username,
@@ -43,7 +44,7 @@ class App extends Component {
       avatar,
     };
     axios
-      .post("http://localhost:5000/api/register", user)
+      .post("/api/register", user)
       .then((res) => {})
       .catch((err) => console.error(err));
   };
@@ -77,6 +78,9 @@ class App extends Component {
               <Route path="/about">
                 <About />
               </Route>
+              <Route path="/contact">
+                <Contact />
+              </Route>
               <Route path="/user/:id">
                 <Userpage
                   username={this.state.username}
@@ -86,8 +90,12 @@ class App extends Component {
               <Route path="/register">
                 <Register Adduser={this.Adduser} />
               </Route>
+
               <Route path="/mentions/:id">
-                <Mentions />
+                <Mentions
+                  username={this.state.username}
+                  follows={this.state.follows}
+                />
               </Route>
               <Route component={NoMatch} />
             </Switch>

@@ -44,6 +44,25 @@ class NavigationBar extends Component {
                   Home
                 </Link>
               </li>
+              {this.props.username ? (
+                <>
+                  <li>
+                    <Link to={`/user/${this.props.username}`} className="links">
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to={`/mentions/${this.props.username}`}
+                      className="links"
+                    >
+                      Mentions
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                ""
+              )}
               <li>
                 <Link to="/users" className="links">
                   Users

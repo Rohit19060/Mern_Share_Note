@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+// eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
 import axios from "axios";
@@ -15,7 +16,7 @@ class Userpage extends Component {
       window.location.href.lastIndexOf("/") + 1
     );
     axios
-      .get(`http://localhost:5000/api/posts/${id}`)
+      .get(`/api/posts/${id}`)
       .then((res) => {
         this.setState({ posts: res.data.map((data) => data) });
       })
@@ -23,7 +24,7 @@ class Userpage extends Component {
         console.log(err);
       });
     axios
-      .get(`http://localhost:5000/api/user/${id}`)
+      .get(`/api/user/${id}`)
       .then((res) => {
         this.setState({ Userinfo: res.data });
       })
@@ -32,7 +33,7 @@ class Userpage extends Component {
       });
     if (this.props.username) {
       axios
-        .get(`http://localhost:5000/api/user/${this.props.username}`)
+        .get(`/api/user/${this.props.username}`)
         .then((res) => {
           this.setState({ follow: res.data.follows });
         })
@@ -43,13 +44,13 @@ class Userpage extends Component {
   }
   delete = (time) => {
     axios
-      .delete("http://localhost:5000/api/delpost?time=" + time)
+      .delete("/api/delpost?time=" + time)
       .then((res) => {
         const id = window.location.href.substring(
           window.location.href.lastIndexOf("/") + 1
         );
         axios
-          .get(`http://localhost:5000/api/posts/${id}`)
+          .get(`/api/posts/${id}`)
           .then((res) => {
             this.setState({ posts: res.data.map((data) => data) });
           })
@@ -66,7 +67,7 @@ class Userpage extends Component {
       follow: follow,
     };
     axios
-      .post("http://localhost:5000/api/follow", followdetails)
+      .post("/api/follow", followdetails)
       .then((res) => {
         this.setState({ follow: res.data });
       })
@@ -79,7 +80,7 @@ class Userpage extends Component {
       follow: unfollow,
     };
     axios
-      .post("http://localhost:5000/api/unfollow", unfollowdetails)
+      .post("/api/unfollow", unfollowdetails)
       .then((res) => {
         this.setState({ follow: res.data });
       })
@@ -95,48 +96,48 @@ class Userpage extends Component {
         <div className="col-md-2">
           <div className="userpanel panel panel-default text-center newmd">
             <div className="panel-heading">
-              <div className="panel-body">
-                <img src={Userinfo.avatar} alt="avatar" className="img-fluid" />
-                <h3>{Userinfo.username}</h3>
-                {username && username !== Userinfo.username ? (
-                  follow.includes(Userinfo.username) ? (
-                    <div>
-                      <br />
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={this.unfollow.bind(
-                          this,
-                          username,
-                          Userinfo.username
-                        )}
-                      >
-                        Unfollow
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <br />
-                      <button
-                        className="btn btn-outline-success"
-                        onClick={this.follow.bind(
-                          this,
-                          username,
-                          Userinfo.username
-                        )}
-                      >
-                        Follow
-                      </button>
-                    </div>
-                  )
+              User Page of <h3>{Userinfo.username}</h3>
+            </div>
+            <div className="panel-body">
+              <img src={Userinfo.avatar} alt="avatar" className="img-fluid" />
+
+              {username && username !== Userinfo.username ? (
+                follow.includes(Userinfo.username) ? (
+                  <div>
+                    <br />
+                    <button
+                      className="btn btn-outline-secondary"
+                      onClick={this.unfollow.bind(
+                        this,
+                        username,
+                        Userinfo.username
+                      )}
+                    >
+                      Unfollow
+                    </button>
+                  </div>
                 ) : (
-                  ""
-                )}
-                <button className="btn btn-default">
-                  <Link to={`/mentions/${Userinfo.username}`}>
-                    Mention Page
-                  </Link>
-                </button>
-              </div>
+                  <div>
+                    <br />
+                    <button
+                      className="btn btn-outline-success"
+                      onClick={this.follow.bind(
+                        this,
+                        username,
+                        Userinfo.username
+                      )}
+                    >
+                      Follow
+                    </button>
+                  </div>
+                )
+              ) : (
+                ""
+              )}
+              <br />
+              <button className="btn btn-default">
+                <Link to={`/mentions/${Userinfo.username}`}>Mention Page</Link>
+              </button>
             </div>
           </div>
         </div>
@@ -152,6 +153,7 @@ class Userpage extends Component {
                   timestamp={post.timestamp}
                   text={post.content}
                   avatar={post.avatar}
+                  likes={post.likes}
                 />
               ))
             : ""}

@@ -1,17 +1,11 @@
 import React from "react";
 
-function About() {
+const About = () => {
   return (
-    <div>
+    <div className="container p-5">
       <h2>About Page</h2>
-      <p>This is mostly about us.</p>
-      <p>
-        eighbor's bratty kid find empty spot in cupboard and sleep all day. Need
-        to chase tail wake up human for food at 4am. Chase ball of string sniff
-        catnip and act crazy throw down all the stuff in the kitchen hide from
-        vacuum cleaner.
-      </p>
+      <p>This application is meant for indiviual project</p>
     </div>
   );
-}
+};
 export default About;

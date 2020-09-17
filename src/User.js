@@ -1,4 +1,5 @@
 import React from "react";
+// eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
 const User = ({ id, avatar }) => {

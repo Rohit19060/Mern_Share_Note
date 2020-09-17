@@ -18,7 +18,7 @@ let PostSchema = new mongoose.Schema({
     required: true,
   },
   likes: {
-    type: Array,
+    type: Number,
   },
 });
 

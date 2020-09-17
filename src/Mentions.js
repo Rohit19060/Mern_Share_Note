@@ -1,73 +1,166 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { Component } from "react";
+// eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
 import axios from "axios";
 import Post from "./Post";
-function Userpage() {
-  const [posts, setPosts] = useState([]);
-  const [userinfo, setUserinfo] = useState([]);
-  const id = useParams().id;
-  useEffect(() => {
+
+class Userpage extends Component {
+  state = {
+    posts: "",
+    Userinfo: "",
+    follow: "",
+  };
+  componentDidMount() {
+    const id = window.location.href.substring(
+      window.location.href.lastIndexOf("/") + 1
+    );
     axios
-      .get(`http://localhost:5000/api/posts/${id}`)
+      .get("/api/posts")
       .then((res) => {
-        setPosts(res.data.map((data) => data));
+        this.setState({ posts: res.data });
       })
       .catch((err) => {
         console.log(err);
       });
     axios
-      .get(`http://localhost:5000/api/user/${id}`)
+      .get(`/api/user/${id}`)
       .then((res) => {
-        setUserinfo(res.data);
+        this.setState({ Userinfo: res.data });
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [id]);
-  return (
-    <div className="row">
-      <div className="col-md-8">
-        {posts.map((post) => (
-          <Post
-            key={post.id}
-            displayName={post.user}
-            timestamp={post.timestamp}
-            text={post.content}
-          />
-        ))}
-      </div>
-      <div className="col-md-4 ">
-        <div className="userpanel panel panel-default">
-          <div className="panel-heading">
+    if (this.props.username) {
+      axios
+        .get(`/api/user/${this.props.username}`)
+        .then((res) => {
+          this.setState({ follow: res.data.follows });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+  delete = (time) => {
+    axios
+      .delete("/api/delpost?time=" + time)
+      .then((res) => {
+        axios
+          .get("/api/posts")
+          .then((res) => {
+            this.setState({ posts: res.data });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => console.error(err));
+  };
+
+  follow = (user, follow) => {
+    const followdetails = {
+      user: user,
+      follow: follow,
+    };
+    axios
+      .post("/api/follow", followdetails)
+      .then((res) => {
+        this.setState({ follow: res.data });
+      })
+      .catch((err) => console.error(err));
+  };
+
+  unfollow = (user, unfollow) => {
+    const unfollowdetails = {
+      user: user,
+      follow: unfollow,
+    };
+    axios
+      .post("/api/unfollow", unfollowdetails)
+      .then((res) => {
+        this.setState({ follow: res.data });
+      })
+      .catch((err) => console.error(err));
+  };
+
+  render() {
+    const { Userinfo, posts, follow } = this.state;
+    const { username } = this.props;
+    return (
+      <div className="row">
+        <div className="col-md-2"></div>
+        <div className="col-md-2">
+          <div className="userpanel panel panel-default text-center newmd">
+            <div className="panel-heading">
+              Mention Page of <h3>{Userinfo.username}</h3>
+            </div>
             <div className="panel-body">
-              <img src={userinfo.avatar} alt="avatar" />
-              <form id="followform" className="" method="post" action="/follow">
-                <div className="btn-group-vertical" role="group">
-                  <input
-                    type="submit"
-                    className="btn btn-default"
-                    name="submit"
-                    value="Follow Bean"
-                  />
-                  <button className="btn btn-default">
-                    <Link to={`/user/${userinfo.username}`}>
-                      User Page of {userinfo.username}
-                    </Link>
-                  </button>
-                  <button className="btn btn-default">
-                    <a href="/mentions/Bean">Mentions of Bean</a>
-                  </button>
-                  <input type="hidden" name="who" value="Bean" />
-                </div>
-              </form>
+              <img src={Userinfo.avatar} alt="avatar" className="img-fluid" />
+
+              {username && username !== Userinfo.username ? (
+                follow.includes(Userinfo.username) ? (
+                  <div>
+                    <br />
+                    <button
+                      className="btn btn-outline-secondary"
+                      onClick={this.unfollow.bind(
+                        this,
+                        username,
+                        Userinfo.username
+                      )}
+                    >
+                      Unfollow
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <br />
+                    <button
+                      className="btn btn-outline-success"
+                      onClick={this.follow.bind(
+                        this,
+                        username,
+                        Userinfo.username
+                      )}
+                    >
+                      Follow
+                    </button>
+                  </div>
+                )
+              ) : (
+                ""
+              )}
+              <br />
+              <button className="btn btn-default">
+                <Link to={`/user/${Userinfo.username}`}>User Page</Link>
+              </button>
             </div>
           </div>
         </div>
+        <div className="col-md-1"></div>
+        <div className="col-md-6">
+          {posts
+            ? posts
+                .filter((post) =>
+                  post.content.includes(`#${Userinfo.username}`)
+                )
+                .map((post) => (
+                  <Post
+                    delete={this.delete}
+                    x={username}
+                    key={post._id}
+                    displayName={post.user}
+                    timestamp={post.timestamp}
+                    text={post.content}
+                    avatar={post.avatar}
+                    likes={post.likes}
+                  />
+                ))
+            : ""}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
-
 export default Userpage;

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+// eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 import Post from "./Post";
 import axios from "axios";
@@ -12,11 +13,11 @@ class Home extends Component {
     const id = this.props.username;
     id
       ? axios
-          .get(`http://localhost:5000/api/user/${id}`)
+          .get(`/api/user/${id}`)
           .then((res) => {
             this.setState({ follow: res.data.follows });
             axios
-              .get("http://localhost:5000/api/posts")
+              .get("/api/posts")
               .then((res) => {
                 this.setState({ posts: res.data });
               })
@@ -28,7 +29,7 @@ class Home extends Component {
             console.log(err);
           })
       : axios
-          .get("http://localhost:5000/api/posts")
+          .get("/api/posts")
           .then((res) => {
             this.setState({ posts: res.data });
           })
@@ -42,7 +43,7 @@ class Home extends Component {
   formHandler = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api/posts", {
+      .post("/api/posts", {
         content: this.state.content,
         user: this.props.username,
         avatar: this.props.avatar,
@@ -57,7 +58,7 @@ class Home extends Component {
 
   delete = (time) => {
     axios
-      .delete("http://localhost:5000/api/delpost?time=" + time)
+      .delete("/api/delpost?time=" + time)
       .then((res) => {
         this.setState({ posts: res.data });
       })
@@ -73,7 +74,7 @@ class Home extends Component {
           <>
             <div className="col-md-2"></div>
             <div className="col-md-2">
-              <div className="panel panel-default newmd">
+              <div className="panel panel-default newmd text-center">
                 <div className="panel-heading h3">Welcome {username}</div>
                 <div className="panel-body">
                   <img
@@ -90,20 +91,13 @@ class Home extends Component {
                   <ul>
                     <ul>
                       {folow.map((e) => (
-                        <Link to={`/user/${e}`}>
+                        <Link to={`/user/${e}`} key={e}>
                           <li>{e}</li>
                         </Link>
                       ))}
                     </ul>
                   </ul>
                 </div>
-                <button className="btn btn-default">
-                  <Link to={`/user/${username}`}>Your Page</Link>
-                </button>
-                <br />
-                <button className="btn btn-default">
-                  <Link to={`/mentions/${username}`}>Mention Page</Link>
-                </button>
               </div>
             </div>
             <div className="col-md-6">
@@ -135,6 +129,7 @@ class Home extends Component {
                         timestamp={post.timestamp}
                         text={post.content}
                         avatar={post.avatar}
+                        likes={post.likes}
                       />
                     ))
                 : ""}
@@ -150,6 +145,7 @@ class Home extends Component {
                         timestamp={post.timestamp}
                         text={post.content}
                         avatar={post.avatar}
+                        likes={post.likes}
                       />
                     ))
                 : ""}
@@ -169,6 +165,7 @@ class Home extends Component {
                       timestamp={post.timestamp}
                       text={post.content}
                       avatar={post.avatar}
+                      likes={post.likes}
                     />
                   ))
                 : ""}

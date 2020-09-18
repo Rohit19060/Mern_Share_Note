@@ -2,22 +2,20 @@ import React, { Component } from "react";
 // eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 import Post from "./Post";
-import axios from "axios";
+import { allposts, save, uniuser, deletepost } from "../services/note";
 class Home extends Component {
   state = {
     content: "",
     posts: null,
-    follow: [],
+    follow: null,
   };
   componentDidMount() {
     const id = this.props.username;
     id
-      ? axios
-          .get(`/api/user/${id}`)
+      ? uniuser(id)
           .then((res) => {
             this.setState({ follow: res.data.follows });
-            axios
-              .get("/api/posts")
+            allposts()
               .then((res) => {
                 this.setState({ posts: res.data });
               })
@@ -28,8 +26,7 @@ class Home extends Component {
           .catch((err) => {
             console.log(err);
           })
-      : axios
-          .get("/api/posts")
+      : allposts()
           .then((res) => {
             this.setState({ posts: res.data });
           })
@@ -42,14 +39,14 @@ class Home extends Component {
 
   formHandler = (e) => {
     e.preventDefault();
-    axios
-      .post("/api/posts", {
-        content: this.state.content,
-        user: this.props.username,
-        avatar: this.props.avatar,
-      })
+    const note = {
+      content: this.state.content,
+      user: this.props.username,
+      avatar: this.props.avatar,
+    };
+    save(note)
       .then((res) => {
-        this.setState({ posts: [...this.state.posts, res.data] });
+        this.setState({ posts: [res.data, ...this.state.posts] });
         this.setState({ content: "" });
         document.getElementById("postform").reset();
       })
@@ -57,8 +54,7 @@ class Home extends Component {
   };
 
   delete = (time) => {
-    axios
-      .delete("/api/delpost?time=" + time)
+    deletepost(time)
       .then((res) => {
         this.setState({ posts: res.data });
       })
@@ -66,8 +62,9 @@ class Home extends Component {
   };
 
   render() {
+    const { follow, posts } = this.state;
     const { username, follows, avatar } = this.props;
-    let folow = this.state.follow == null ? follows : this.state.follow;
+    const folow = follow == null ? follows : follow;
     return (
       <div className="row">
         {username ? (
@@ -83,16 +80,22 @@ class Home extends Component {
                     width="200px"
                     className="text-center"
                   />
+                  <br />
+                  <Link to={`/user/${username}`}>User Page</Link>
+                  <br />
+                  <Link to={`/mentions/${username}`}>Mention Page</Link>
+                  <br />
+                  <br />
                   {folow.length > 0 ? (
                     <p> You are Following: </p>
                   ) : (
                     <p> You are not Following anyone yet</p>
                   )}
                   <ul>
-                    <ul>
+                    <ul className="list-unstyled ">
                       {folow.map((e) => (
                         <Link to={`/user/${e}`} key={e}>
-                          <li>{e}</li>
+                          <li className="text-success">{e}</li>
                         </Link>
                       ))}
                     </ul>
@@ -117,35 +120,18 @@ class Home extends Component {
                   value="Submit"
                 />
               </form>
-              {this.state.posts
-                ? this.state.posts
-                    .filter((post) => folow.includes(post.user))
+              {posts
+                ? posts
+                    .filter(
+                      (post) =>
+                        folow.includes(post.user) || post.user === username
+                    )
                     .map((post) => (
                       <Post
                         delete={this.delete}
                         x={username}
                         key={post._id}
-                        displayName={post.user}
-                        timestamp={post.timestamp}
-                        text={post.content}
-                        avatar={post.avatar}
-                        likes={post.likes}
-                      />
-                    ))
-                : ""}
-              {this.state.posts
-                ? this.state.posts
-                    .filter((post) => post.user === username)
-                    .map((post) => (
-                      <Post
-                        delete={this.delete}
-                        x={username}
-                        key={post._id}
-                        displayName={post.user}
-                        timestamp={post.timestamp}
-                        text={post.content}
-                        avatar={post.avatar}
-                        likes={post.likes}
+                        post={post}
                       />
                     ))
                 : ""}
@@ -155,17 +141,22 @@ class Home extends Component {
           <>
             <div className="col-md-2"></div>
             <div className="col-md-8">
-              {this.state.posts
-                ? this.state.posts.map((post) => (
+              <h2 className="text-center">
+                <span role="img" aria-label="emoji">
+                  🤩
+                </span>{" "}
+                Welcome Happy to See you here{" "}
+                <span role="img" aria-label="emoji">
+                  🤩
+                </span>
+              </h2>
+              {posts
+                ? posts.map((post) => (
                     <Post
                       delete={this.delete}
                       x={username}
                       key={post._id}
-                      displayName={post.user}
-                      timestamp={post.timestamp}
-                      text={post.content}
-                      avatar={post.avatar}
-                      likes={post.likes}
+                      post={post}
                     />
                   ))
                 : ""}

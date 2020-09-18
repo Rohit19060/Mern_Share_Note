@@ -2,7 +2,13 @@ import React, { Component } from "react";
 // eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
-import axios from "axios";
+import {
+  allposts,
+  unfollowuser,
+  followuser,
+  uniuser,
+  deletepost,
+} from "../services/note";
 import Post from "./Post";
 
 class Userpage extends Component {
@@ -15,16 +21,14 @@ class Userpage extends Component {
     const id = window.location.href.substring(
       window.location.href.lastIndexOf("/") + 1
     );
-    axios
-      .get(`/api/posts/${id}`)
+    allposts()
       .then((res) => {
-        this.setState({ posts: res.data.map((data) => data) });
+        this.setState({ posts: res.data });
       })
       .catch((err) => {
         console.log(err);
       });
-    axios
-      .get(`/api/user/${id}`)
+    uniuser(id)
       .then((res) => {
         this.setState({ Userinfo: res.data });
       })
@@ -32,8 +36,7 @@ class Userpage extends Component {
         console.log(err);
       });
     if (this.props.username) {
-      axios
-        .get(`/api/user/${this.props.username}`)
+      uniuser(this.props.username)
         .then((res) => {
           this.setState({ follow: res.data.follows });
         })
@@ -43,16 +46,11 @@ class Userpage extends Component {
     }
   }
   delete = (time) => {
-    axios
-      .delete("/api/delpost?time=" + time)
+    deletepost(time)
       .then((res) => {
-        const id = window.location.href.substring(
-          window.location.href.lastIndexOf("/") + 1
-        );
-        axios
-          .get(`/api/posts/${id}`)
+        allposts()
           .then((res) => {
-            this.setState({ posts: res.data.map((data) => data) });
+            this.setState({ posts: res.data });
           })
           .catch((err) => {
             console.log(err);
@@ -66,8 +64,7 @@ class Userpage extends Component {
       user: user,
       follow: follow,
     };
-    axios
-      .post("/api/follow", followdetails)
+    followuser(followdetails)
       .then((res) => {
         this.setState({ follow: res.data });
       })
@@ -79,8 +76,7 @@ class Userpage extends Component {
       user: user,
       follow: unfollow,
     };
-    axios
-      .post("/api/unfollow", unfollowdetails)
+    unfollowuser(unfollowdetails)
       .then((res) => {
         this.setState({ follow: res.data });
       })
@@ -96,7 +92,7 @@ class Userpage extends Component {
         <div className="col-md-2">
           <div className="userpanel panel panel-default text-center newmd">
             <div className="panel-heading">
-              User Page of <h3>{Userinfo.username}</h3>
+              Mention Page of <h3>{Userinfo.username}</h3>
             </div>
             <div className="panel-body">
               <img src={Userinfo.avatar} alt="avatar" className="img-fluid" />
@@ -136,7 +132,7 @@ class Userpage extends Component {
               )}
               <br />
               <button className="btn btn-default">
-                <Link to={`/mentions/${Userinfo.username}`}>Mention Page</Link>
+                <Link to={`/user/${Userinfo.username}`}>User Page</Link>
               </button>
             </div>
           </div>
@@ -144,18 +140,18 @@ class Userpage extends Component {
         <div className="col-md-1"></div>
         <div className="col-md-6">
           {posts
-            ? posts.map((post) => (
-                <Post
-                  delete={this.delete}
-                  x={username}
-                  key={post._id}
-                  displayName={post.user}
-                  timestamp={post.timestamp}
-                  text={post.content}
-                  avatar={post.avatar}
-                  likes={post.likes}
-                />
-              ))
+            ? posts
+                .filter((post) =>
+                  post.content.includes(`#${Userinfo.username}`)
+                )
+                .map((post) => (
+                  <Post
+                    delete={this.delete}
+                    x={username}
+                    key={post._id}
+                    post={post}
+                  />
+                ))
             : ""}
         </div>
       </div>

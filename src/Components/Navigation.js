@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-class NavigationBar extends Component {
+class Navigation extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,25 +44,7 @@ class NavigationBar extends Component {
                   Home
                 </Link>
               </li>
-              {this.props.username ? (
-                <>
-                  <li>
-                    <Link to={`/user/${this.props.username}`} className="links">
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={`/mentions/${this.props.username}`}
-                      className="links"
-                    >
-                      Mentions
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                ""
-              )}
+
               <li>
                 <Link to="/users" className="links">
                   Users
@@ -126,4 +108,4 @@ class NavigationBar extends Component {
     );
   }
 }
-export default NavigationBar;
+export default Navigation;

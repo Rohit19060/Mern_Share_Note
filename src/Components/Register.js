@@ -15,7 +15,8 @@ class Register extends Component {
 
   formHandler = (e) => {
     e.preventDefault();
-    this.props.Adduser(this.state.id, this.state.password, this.state.avatar);
+    const { id, password, avatar } = this.state;
+    this.props.Adduser(id, password, avatar);
     document.getElementById("registerform").reset();
   };
 

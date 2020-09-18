@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { alluser } from "../services/note";
 import User from "./User";
 
 function Users() {
   const [user, setUser] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("/api/users")
+    alluser()
       .then((res) => {
         setUser(res.data.map((data) => data));
       })

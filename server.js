@@ -1,13 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const app = express();
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const path = require("path");
+
 const port = process.env.PORT || 5000;
 
-const SECRET = "This is my Secret";
+const app = express();
+
+const SECRET = process.env.SECRET || "This is my Secret";
+
 const { mongoURI } = require("./src/config/keys");
 
 mongoose.connect(mongoURI, {
@@ -37,7 +41,7 @@ app.get("/api/posts", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      res.json(posts);
+      res.json(posts.reverse());
     }
   });
 });
@@ -45,9 +49,8 @@ app.get("/api/posts", (req, res) => {
 app.post("/api/posts", (req, res) => {
   const { content, user, avatar } = req.body;
   let post = new PostSchema();
-
-  var currentdate = new Date();
-  var datetime =
+  const currentdate = new Date();
+  const datetime =
     currentdate.getDate() +
     "-" +
     (currentdate.getMonth() + 1) +
@@ -85,10 +88,8 @@ app.get("/api/users", (req, res) => {
 });
 
 app.delete("/api/delpost", (req, res) => {
-  var time = req.query.time;
-  console.log(time);
-  let query = { timestamp: time };
-  PostSchema.deleteOne(query, function (err) {
+  const time = req.query.time;
+  PostSchema.deleteOne({ timestamp: time }, (err) => {
     if (err) {
       console.log(err);
       return;
@@ -97,7 +98,7 @@ app.delete("/api/delpost", (req, res) => {
         if (err) {
           console.log(err);
         } else {
-          res.json(posts);
+          res.json(posts.reverse());
         }
       });
     }
@@ -105,113 +106,97 @@ app.delete("/api/delpost", (req, res) => {
 });
 
 app.get("/api/posts/:id", (req, res) => {
-  var id = req.params.id;
-  PostSchema.find({}, (err, posts) => {
+  const id = req.params.id;
+  PostSchema.find({ user: id }, (err, posts) => {
     if (err) {
       console.log(err);
     } else {
-      var length = posts.length;
-      var x = [];
-      for (let i = 0; i < length; i++) {
-        if (posts[i].user === id) {
-          x.push(posts[i]);
-        }
-      }
-      res.json(x);
+      res.json(posts.reverse());
     }
   });
 });
 
 app.get("/api/user/:id", (req, res) => {
-  var id = req.params.id;
-  UserSchema.find({}, (err, users) => {
+  const id = req.params.id;
+  UserSchema.find({ id: id }, (err, user) => {
     if (err) {
       console.log(err);
     } else {
-      var length = users.length;
-      var x = [];
-      for (let i = 0; i < length; i++) {
-        if (users[i].id === id) {
-          x.push(users[i]);
-        }
-      }
-      res.status(200).json({
-        username: x[0].id,
-        avatar: x[0].avatar,
-        follows: x[0].follows,
+      res.json({
+        username: user[0].id,
+        avatar: user[0].avatar,
+        follows: user[0].follows,
       });
     }
   });
 });
 
-app.post("/api/register", (req, res) => {
+app.post("/api/register", async (req, res) => {
   const { id, password, avatar } = req.body;
   if (id !== null && password !== null && avatar !== null) {
-    const follows = [];
-    UserSchema.find({}, (err, users) => {
+    let hashedpassword = await bcrypt.hash(password, 10);
+    UserSchema.find({ id: id }, (err, user) => {
       if (err) {
         console.log(err);
       } else {
-        var user = users.filter((u) => u.id === id)[0];
-        if (user) {
+        if (user[0]) {
           return res.status(401).json({ error: "Try again with another Id" });
         } else {
           let user = new UserSchema();
           user.id = id;
           user.avatar = avatar;
-          user.password = password;
-          user.follows = follows;
+          user.password = hashedpassword;
+          user.follows = [];
           user.save(function (err) {
             if (err) {
               console.log(err);
               return;
             } else {
-              console.log("User registerd Successful");
+              res.json(user.id);
             }
           });
         }
       }
     });
   } else {
-    console.log("Id, Password and Avatar link is required");
+    return res.status(401).json({
+      error: "Id, Password and Avatar link is required",
+    });
   }
 });
 
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
-  UserSchema.find({}, (err, users) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const user = users.filter((u) => u.id === username)[0];
-      if (!user) {
-        return res.status(401).json({ error: "invalid username or password" });
-      } else {
-        if (password === user.password) {
-          const userForToken = {
-            username: user.id,
-          };
-          const token = jwt.sign(userForToken, SECRET);
-          return res.status(200).json({
-            token,
-            username: user.id,
-            avatar: user.avatar,
-            follows: user.follows,
-          });
-        } else {
-          return res
-            .status(401)
-            .json({ error: "invalid username or password" });
-        }
-      }
-    }
+  const user = await UserSchema.findOne({ id: username });
+  const passwordCorrect =
+    user === null ? false : await bcrypt.compare(password, user.password);
+  if (!(user && passwordCorrect)) {
+    return res.status(401).json({
+      error: "invalid username or password",
+    });
+  }
+  const userForToken = {
+    username: user.id,
+    id: user._id,
+  };
+  const token = jwt.sign(userForToken, SECRET);
+  return res.status(200).json({
+    token,
+    username: user.id,
+    avatar: user.avatar,
+    follows: user.follows,
   });
 });
 
-app.post("/api/follow", (req, res) => {
-  const { user, follow } = req.body;
+app.post("/api/follow", async (req, res) => {
+  const { token, follow } = req.body;
+  const decodedToken = jwt.verify(token, SECRET);
+  const id = decodedToken.id;
+  if (!token || !id) {
+    return res.status(401).json({ error: "token missing or invalid" });
+  }
   UserSchema.updateOne(
-    { id: user },
+    { _id: id },
     {
       $push: {
         follows: follow,
@@ -225,11 +210,11 @@ app.post("/api/follow", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        UserSchema.find({}, (err, users) => {
+        UserSchema.find({ _id: id }, (err, user) => {
           if (err) {
             console.log(err);
           } else {
-            res.json(users.filter((e) => e.id === user)[0].follows);
+            res.json(user[0].follows);
           }
         });
       }
@@ -238,9 +223,14 @@ app.post("/api/follow", (req, res) => {
 });
 
 app.post("/api/unfollow", (req, res) => {
-  const { user, follow } = req.body;
+  const { token, follow } = req.body;
+  const decodedToken = jwt.verify(token, SECRET);
+  const id = decodedToken.id;
+  if (!token || !id) {
+    return res.status(401).json({ error: "token missing or invalid" });
+  }
   UserSchema.updateOne(
-    { id: user },
+    { _id: id },
     {
       $pull: {
         follows: follow,
@@ -254,11 +244,11 @@ app.post("/api/unfollow", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        UserSchema.find({}, (err, users) => {
+        UserSchema.find({ _id: id }, (err, user) => {
           if (err) {
             console.log(err);
           } else {
-            res.json(users.filter((e) => e.id === user)[0].follows);
+            res.json(user[0].follows);
           }
         });
       }
@@ -266,9 +256,8 @@ app.post("/api/unfollow", (req, res) => {
   );
 });
 
-app.put("/api/follow", (req, res) => {
+app.put("/api/likes", (req, res) => {
   const { timestamp } = req.body;
-  console.log(timestamp);
   PostSchema.updateOne(
     { timestamp: timestamp },
     {
@@ -284,12 +273,11 @@ app.put("/api/follow", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        PostSchema.find({}, (err, posts) => {
+        PostSchema.find({ timestamp: timestamp }, (err, post) => {
           if (err) {
             console.log(err);
           } else {
-            res.json(posts.filter((e) => e.timestamp === timestamp)[0].likes);
-            console.log(posts);
+            res.json(post[0].likes);
           }
         });
       }

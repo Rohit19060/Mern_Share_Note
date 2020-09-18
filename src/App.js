@@ -1,20 +1,25 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
-import Users from "./Users";
-import Userpage from "./Userpage";
-import Register from "./Register";
-import Mentions from "./Mentions";
-import NoMatch from "./NoMatch";
-import axios from "axios";
+
+import { login, register } from "./services/note";
+
 import { Layout } from "./Components/Layout";
-import NavigationBar from "./Components/NavigationBar";
+
+import Navigation from "./Components/Navigation";
+import Home from "./Components/Home";
+import About from "./Components/About";
+import Contact from "./Components/Contact";
+import Users from "./Components/Users";
+import Userpage from "./Components/Userpage";
+import Register from "./Components/Register";
+import Mentions from "./Components/Mentions";
+import NoMatch from "./Components/NoMatch";
+
 import "./App.css";
+
 class App extends Component {
   state = {
-    units: [],
+    token: null,
     username: null,
     avatar: null,
     follows: null,
@@ -25,10 +30,10 @@ class App extends Component {
       username,
       password,
     };
-    axios
-      .post("/api/login", user)
+    login(user)
       .then((res) => {
         this.setState({
+          token: res.data.token,
           username: res.data.username,
           avatar: res.data.avatar,
           follows: res.data.follows,
@@ -43,22 +48,24 @@ class App extends Component {
       password,
       avatar,
     };
-    axios
-      .post("/api/register", user)
-      .then((res) => {})
+    register(user)
+      .then((res) => {
+        alert(res.data + " Registered Successfully");
+      })
       .catch((err) => console.error(err));
   };
 
   logout = () => {
-    this.setState({ username: null, avatar: null, follows: null });
+    this.setState({ username: null, avatar: null, follows: null, token: null });
   };
 
   render() {
+    const { username, follows, avatar, token } = this.state;
     return (
       <div>
         <Router>
-          <NavigationBar
-            username={this.state.username}
+          <Navigation
+            username={username}
             setUser={this.setUser}
             logout={this.logout}
           />
@@ -66,11 +73,7 @@ class App extends Component {
           <Layout>
             <Switch>
               <Route exact path="/">
-                <Home
-                  username={this.state.username}
-                  follows={this.state.follows}
-                  avatar={this.state.avatar}
-                />
+                <Home username={username} follows={follows} avatar={avatar} />
               </Route>
               <Route path="/users">
                 <Users />
@@ -82,20 +85,13 @@ class App extends Component {
                 <Contact />
               </Route>
               <Route path="/user/:id">
-                <Userpage
-                  username={this.state.username}
-                  follows={this.state.follows}
-                />
+                <Userpage username={username} follows={follows} token={token} />
               </Route>
               <Route path="/register">
                 <Register Adduser={this.Adduser} />
               </Route>
-
               <Route path="/mentions/:id">
-                <Mentions
-                  username={this.state.username}
-                  follows={this.state.follows}
-                />
+                <Mentions username={username} follows={follows} token={token} />
               </Route>
               <Route component={NoMatch} />
             </Switch>

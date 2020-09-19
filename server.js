@@ -273,7 +273,7 @@ app.post("/api/unfollow", (req, res) => {
 app.put("/api/likes", ( req ,  res ) => {
   const {  timestamp  } = req.body ;
   PostSchema.updateOne(
-    { timestamp: timestamp   },
+    { timestamp: timestamp },
     {
       $inc: {
         likes: 1,
@@ -283,11 +283,15 @@ app.put("/api/likes", ( req ,  res ) => {
       upsert: true,
       multi: true,
     },
-    (err , posts ) => {
+    (err, posts) => {
       if (err) {
-        console.log( err );
+     
+        console.log(err);
+        
       } else {
-        console.log( posts );
+
+       console.log(posts);
+       
       }
     }
   );

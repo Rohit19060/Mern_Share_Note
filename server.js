@@ -287,13 +287,7 @@ app.put("/api/likes", (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        PostSchema.find({ timestamp: timestamp }, (err, post) => {
-          if (err) {
-            console.log(err);
-          } else {
-            res.json(post[0].likes);
-          }
-        });
+        console.log(posts);
       }
     }
   );

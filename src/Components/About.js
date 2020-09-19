@@ -1,5 +1,6 @@
 import React from "react";
 
+// About Page Component
 const About = () => {
   return (
     <div className="container p-5">

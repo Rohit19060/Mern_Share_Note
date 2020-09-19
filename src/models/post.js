@@ -1,5 +1,6 @@
 let mongoose = require("mongoose");
 
+// Post schema for all the posts
 let PostSchema = new mongoose.Schema({
   user: {
     type: String,

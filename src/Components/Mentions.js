@@ -2,6 +2,7 @@ import React, { Component } from "react";
 // eslint-disable-next-line no-unused-vars
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 
+// Getting function from axios
 import {
   allposts,
   unfollowuser,
@@ -18,9 +19,11 @@ class Userpage extends Component {
     follow: "",
   };
   componentDidMount() {
+    // Getting id from url
     const id = window.location.href.substring(
       window.location.href.lastIndexOf("/") + 1
     );
+    // Setting all post state
     allposts()
       .then((res) => {
         this.setState({ posts: res.data });
@@ -28,6 +31,7 @@ class Userpage extends Component {
       .catch((err) => {
         console.log(err);
       });
+    // Current User info
     uniuser(id)
       .then((res) => {
         this.setState({ Userinfo: res.data });
@@ -36,6 +40,7 @@ class Userpage extends Component {
         console.log(err);
       });
     if (this.props.username) {
+      // Getting follows
       uniuser(this.props.username)
         .then((res) => {
           this.setState({ follow: res.data.follows });
@@ -45,6 +50,7 @@ class Userpage extends Component {
         });
     }
   }
+  // Deleting post based on time
   delete = (time) => {
     deletepost(time)
       .then((res) => {
@@ -59,6 +65,7 @@ class Userpage extends Component {
       .catch((err) => console.error(err));
   };
 
+  // Add follower in logged in user
   follow = (user, follow) => {
     const followdetails = {
       user: user,
@@ -71,6 +78,7 @@ class Userpage extends Component {
       .catch((err) => console.error(err));
   };
 
+  // Remove followes in logged in user
   unfollow = (user, unfollow) => {
     const unfollowdetails = {
       user: user,
@@ -84,6 +92,7 @@ class Userpage extends Component {
   };
 
   render() {
+    // Destructuring
     const { Userinfo, posts, follow } = this.state;
     const { username } = this.props;
     return (
@@ -96,7 +105,6 @@ class Userpage extends Component {
             </div>
             <div className="panel-body">
               <img src={Userinfo.avatar} alt="avatar" className="img-fluid" />
-
               {username && username !== Userinfo.username ? (
                 follow.includes(Userinfo.username) ? (
                   <div>

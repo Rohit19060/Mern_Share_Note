@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 import Post from "./Post";
 import { allposts, save, uniuser, deletepost } from "../services/note";
+
+// Home page component
 class Home extends Component {
   state = {
     content: "",
@@ -10,7 +12,9 @@ class Home extends Component {
     follow: null,
   };
   componentDidMount() {
+    // Getting Id from Props as username
     const id = this.props.username;
+    // Based on login request performs
     id
       ? uniuser(id)
           .then((res) => {
@@ -37,6 +41,7 @@ class Home extends Component {
 
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
+  // New post forn handler
   formHandler = (e) => {
     e.preventDefault();
     const note = {
@@ -46,6 +51,7 @@ class Home extends Component {
     };
     save(note)
       .then((res) => {
+        // adding new post with old posts using spread operator
         this.setState({ posts: [res.data, ...this.state.posts] });
         this.setState({ content: "" });
         document.getElementById("postform").reset();
@@ -53,6 +59,7 @@ class Home extends Component {
       .catch((err) => console.error(err));
   };
 
+  // Delete function based on timestamp
   delete = (time) => {
     deletepost(time)
       .then((res) => {
@@ -62,6 +69,7 @@ class Home extends Component {
   };
 
   render() {
+    // Destructuring from state and props
     const { follow, posts } = this.state;
     const { username, follows, avatar } = this.props;
     const folow = follow == null ? follows : follow;

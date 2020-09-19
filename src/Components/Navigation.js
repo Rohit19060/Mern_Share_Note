@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
+// Main navigation component
 class Navigation extends Component {
   constructor(props) {
     super(props);
@@ -13,6 +14,7 @@ class Navigation extends Component {
 
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
+  // Login form handler
   formHandler = (e) => {
     e.preventDefault();
     this.props.setUser(this.state.username, this.state.password);

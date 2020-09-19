@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+// Register form page component
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -10,9 +11,10 @@ class Register extends Component {
     };
     this.formHandler = this.formHandler.bind(this);
   }
-
+  // Setting state based on target name
   onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
+  // new User register form handler
   formHandler = (e) => {
     e.preventDefault();
     const { id, password, avatar } = this.state;

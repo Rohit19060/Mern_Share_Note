@@ -42,6 +42,7 @@ class App extends Component {
       .catch((err) => console.error(err));
   };
 
+  // User registration
   Adduser = (id, password, avatar) => {
     const user = {
       id,
@@ -55,11 +56,13 @@ class App extends Component {
       .catch((err) => console.error(err));
   };
 
+  // Logout will set all the state to be null
   logout = () => {
     this.setState({ username: null, avatar: null, follows: null, token: null });
   };
 
   render() {
+    // Destructuring from the state
     const { username, follows, avatar, token } = this.state;
     return (
       <div>

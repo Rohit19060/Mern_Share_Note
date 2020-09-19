@@ -1,3 +1,4 @@
+// All the packages
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -6,12 +7,13 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const path = require("path");
 
+// Process Constants
 const port = process.env.PORT || 5000;
+const SECRET = process.env.SECRET || "This is my Secret";
 
 const app = express();
 
-const SECRET = process.env.SECRET || "This is my Secret";
-
+// Database Related
 const { mongoURI } = require("./src/config/keys");
 
 mongoose.connect(mongoURI, {
@@ -23,19 +25,21 @@ mongoose.connection
   .once("open", () => console.log("Database Connected"))
   .on("error", (err) => console.log(err));
 
+// Schema
 let UserSchema = require("./src/models/user");
 let PostSchema = require("./src/models/post");
 
+// App use
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
 app.use(express.static(path.resolve(__dirname, "build")));
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+// All Post Get Request
 app.get("/api/posts", (req, res) => {
   PostSchema.find({}, (err, posts) => {
     if (err) {
@@ -46,6 +50,7 @@ app.get("/api/posts", (req, res) => {
   });
 });
 
+// Post inserting in database
 app.post("/api/posts", (req, res) => {
   const { content, user, avatar } = req.body;
   let post = new PostSchema();
@@ -77,6 +82,7 @@ app.post("/api/posts", (req, res) => {
   });
 });
 
+// All users get request
 app.get("/api/users", (req, res) => {
   UserSchema.find({}, (err, users) => {
     if (err) {
@@ -87,6 +93,7 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+// Post delete based on timestamp
 app.delete("/api/delpost", (req, res) => {
   const time = req.query.time;
   PostSchema.deleteOne({ timestamp: time }, (err) => {
@@ -105,6 +112,7 @@ app.delete("/api/delpost", (req, res) => {
   });
 });
 
+// Post based on user id
 app.get("/api/posts/:id", (req, res) => {
   const id = req.params.id;
   PostSchema.find({ user: id }, (err, posts) => {
@@ -116,6 +124,7 @@ app.get("/api/posts/:id", (req, res) => {
   });
 });
 
+// Send user info for userpage
 app.get("/api/user/:id", (req, res) => {
   const id = req.params.id;
   UserSchema.find({ id: id }, (err, user) => {
@@ -131,6 +140,7 @@ app.get("/api/user/:id", (req, res) => {
   });
 });
 
+// new user registeration
 app.post("/api/register", async (req, res) => {
   const { id, password, avatar } = req.body;
   if (id !== null && password !== null && avatar !== null) {
@@ -165,6 +175,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
+// Login Req/res
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await UserSchema.findOne({ id: username });
@@ -188,6 +199,7 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
+// FOllow request based on user Token
 app.post("/api/follow", async (req, res) => {
   const { token, follow } = req.body;
   const decodedToken = jwt.verify(token, SECRET);
@@ -222,6 +234,7 @@ app.post("/api/follow", async (req, res) => {
   );
 });
 
+// Unfollow request based on User Token
 app.post("/api/unfollow", (req, res) => {
   const { token, follow } = req.body;
   const decodedToken = jwt.verify(token, SECRET);
@@ -256,6 +269,7 @@ app.post("/api/unfollow", (req, res) => {
   );
 });
 
+// Increment likes based on TimeStamp
 app.put("/api/likes", (req, res) => {
   const { timestamp } = req.body;
   PostSchema.updateOne(

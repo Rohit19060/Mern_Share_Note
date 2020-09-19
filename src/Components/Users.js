@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { alluser } from "../services/note";
 import User from "./User";
 
+// All user component for showing all the user in the database
 function Users() {
   const [user, setUser] = useState([]);
 

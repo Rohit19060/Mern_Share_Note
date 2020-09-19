@@ -1,5 +1,6 @@
 import React from "react";
 
+// Contact page Component
 const Contact = () => {
   return (
     <div className="container p-5">

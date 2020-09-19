@@ -1,5 +1,6 @@
 let mongoose = require("mongoose");
 
+// user schema for user collections
 let UserSchema = new mongoose.Schema({
   id: {
     type: String,

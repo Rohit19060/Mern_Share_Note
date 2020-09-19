@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// All the axios request are here
 export const login = (user) => {
   return axios.post("/api/login", user);
 };

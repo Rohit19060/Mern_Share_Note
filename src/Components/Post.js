@@ -4,6 +4,7 @@ import { BrowserRouter as Switch, Link } from "react-router-dom";
 import like from "../Icons/like.svg";
 import { likeupdate } from "../services/note";
 
+// Post component for all the posts
 class Post extends Component {
   state = { likes: this.props.post.likes };
 
@@ -19,6 +20,7 @@ class Post extends Component {
   };
 
   render() {
+    // Destructuring
     const { user, timestamp, content, avatar } = this.props.post;
     const x = this.props.x;
     const likes = this.state.likes;

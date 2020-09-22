@@ -41,3 +41,6 @@ export const deletepost = (time) => {
 export const likeupdate = (update) => {
   return axios.put("/api/likes", update);
 };
+export const postusers = () => {
+  return axios.get("/api/userforpost");
+};

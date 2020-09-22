@@ -93,6 +93,20 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+app.get("/api/userforpost", (req, res) => {
+  UserSchema.find({}, (err, users) => {
+    if (err) {
+      console.log(err);
+    } else {
+      let data = [];
+      users.forEach((element) => {
+        data.push(element.id);
+      });
+      res.json(data);
+    }
+  });
+});
+
 // Post delete based on timestamp
 app.delete("/api/delpost", (req, res) => {
   const time = req.query.time;
@@ -270,8 +284,8 @@ app.post("/api/unfollow", (req, res) => {
 });
 
 // Increment likes based on TimeStamp
-app.put("/api/likes", ( req ,  res ) => {
-  const {  timestamp  } = req.body ;
+app.put("/api/likes", (req, res) => {
+  const { timestamp } = req.body;
   PostSchema.updateOne(
     { timestamp: timestamp },
     {
@@ -285,13 +299,9 @@ app.put("/api/likes", ( req ,  res ) => {
     },
     (err, posts) => {
       if (err) {
-     
         console.log(err);
-        
       } else {
-
-       console.log(posts);
-       
+        console.log(posts);
       }
     }
   );

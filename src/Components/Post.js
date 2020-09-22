@@ -3,10 +3,22 @@ import React, { Component } from "react";
 import { BrowserRouter as Switch, Link } from "react-router-dom";
 import like from "../Icons/like.svg";
 import { likeupdate } from "../services/note";
+import { postusers } from "../services/note";
 
 // Post component for all the posts
 class Post extends Component {
-  state = { likes: this.props.post.likes };
+  state = { likes: this.props.post.likes, users: [] };
+
+  componentDidMount() {
+    postusers()
+      .then((res) => {
+        console.log(res.data);
+        this.setState({ users: res.data });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   updatelike = () => {
     const update = {
@@ -22,6 +34,28 @@ class Post extends Component {
   render() {
     // Destructuring
     const { user, timestamp, content, avatar } = this.props.post;
+
+    // Advanced post view
+    let contentx = content.split(" ");
+    let data = [];
+    for (let i = 0; i < contentx.length; i++) {
+      let link = "";
+      if (this.state.users.includes(contentx[i].substring(1))) {
+        let user = contentx[i].charAt(1).toUpperCase() + contentx[i].slice(2);
+        if (contentx[i].charAt(0) === "#") {
+          link = <Link to={`/mentions/${user}`}>{contentx[i]}</Link>;
+        } else if (contentx[i].charAt(0) === "@") {
+          link = <Link to={`/user/${user}`}>{contentx[i]}</Link>;
+        } else {
+          link = contentx[i];
+        }
+      } else {
+        link = contentx[i];
+      }
+      data.push(link);
+      data.push(" ");
+    }
+
     const x = this.props.x;
     const likes = this.state.likes;
     return (
@@ -33,7 +67,7 @@ class Post extends Component {
           <div className="col-11">
             <Link to={`/user/${user}`}>@{user}</Link>
             <span> {timestamp}</span>
-            <div>{content}</div>
+            <div>{data}</div>
             {x && x === user ? (
               <button
                 onClick={this.props.delete.bind(this, timestamp)}

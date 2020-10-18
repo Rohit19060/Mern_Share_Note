@@ -12,7 +12,6 @@ class Post extends Component {
   componentDidMount() {
     postusers()
       .then((res) => {
-        console.log(res.data);
         this.setState({ users: res.data });
       })
       .catch((err) => {
@@ -26,6 +25,7 @@ class Post extends Component {
     };
     likeupdate(update)
       .then((res) => {
+        console.log(res.data);
         this.setState({ likes: res.data });
       })
       .catch((err) => console.error(err));

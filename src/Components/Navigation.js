@@ -92,6 +92,7 @@ class Navigation extends Component {
                     placeholder="Password"
                     onChange={this.onChange}
                     required
+                    autoComplete
                   />
                   <input
                     type="submit"

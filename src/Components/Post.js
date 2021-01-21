@@ -25,7 +25,6 @@ class Post extends Component {
     };
     likeupdate(update)
       .then((res) => {
-        console.log(res.data);
         this.setState({ likes: res.data });
       })
       .catch((err) => console.error(err));

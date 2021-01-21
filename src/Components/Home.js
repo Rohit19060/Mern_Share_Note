@@ -152,8 +152,8 @@ class Home extends Component {
               <h2 className="text-center">
                 <span role="img" aria-label="emoji">
                   🤩
-                </span>{" "}
-                Welcome Happy to See you here{" "}
+                </span>
+                Welcome Happy to See you here
                 <span role="img" aria-label="emoji">
                   🤩
                 </span>

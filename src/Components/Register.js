@@ -54,7 +54,7 @@ class Register extends Component {
           placeholder="Password"
           onChange={this.onChange}
           required
-          autoComplete
+          autocomplete="on"
         />
         <br />
         <input type="submit" value="Register" className="btn btn-primary" />
